@@ -24,7 +24,7 @@ const projects: Project[] = [
     description:
       'Aplicación B2B de gestión de proyectos para empresas de software. TFG de DAW con mención "Con Distinción". Gestión de sprints, tareas, equipos y reportes con Spring Boot + React.',
     tags: ["Spring Boot", "React", "TypeScript", "PostgreSQL", "Docker"],
-    github: "https://github.com/juaandix/Proyecto-Intermodular",
+    github: "https://github.com/juaandix/ProdSync",
   },
   {
     name: "MobileHoursApp",
