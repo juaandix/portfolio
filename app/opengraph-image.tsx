@@ -28,6 +28,7 @@ export default function Image() {
             backgroundImage:
               "linear-gradient(rgba(148,163,184,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.05) 1px, transparent 1px)",
             backgroundSize: "72px 72px",
+            display: "flex",
           }}
         />
 
@@ -42,6 +43,7 @@ export default function Image() {
             borderRadius: "50%",
             background: "radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%)",
             transform: "translateY(-50%)",
+            display: "flex",
           }}
         />
 
@@ -64,6 +66,7 @@ export default function Image() {
               height: 8,
               borderRadius: "50%",
               background: "#60a5fa",
+              display: "flex",
             }}
           />
           <span
@@ -82,39 +85,64 @@ export default function Image() {
         {/* Name */}
         <div
           style={{
-            fontSize: 72,
-            fontWeight: 800,
-            color: "#f1f5f9",
-            lineHeight: 1.05,
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "baseline",
+            gap: "0 16px",
             marginBottom: 16,
-            letterSpacing: "-0.02em",
           }}
         >
-          Juan David{" "}
-          <span style={{ color: "#3b82f6" }}>Gil Diaz</span>
+          <span
+            style={{
+              fontSize: 72,
+              fontWeight: 800,
+              color: "#f1f5f9",
+              lineHeight: 1.05,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Juan David
+          </span>
+          <span
+            style={{
+              fontSize: 72,
+              fontWeight: 800,
+              color: "#3b82f6",
+              lineHeight: 1.05,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Gil Diaz
+          </span>
         </div>
 
         {/* Tagline */}
         <div
           style={{
-            fontSize: 22,
-            color: "#64748b",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: "0 8px",
             marginBottom: 48,
-            maxWidth: 640,
-            lineHeight: 1.5,
+            maxWidth: 700,
           }}
         >
-          Desarrollador Full-Stack especializado en{" "}
-          <span style={{ color: "#cbd5e1" }}>Java · Spring Boot · Next.js</span>
+          <span style={{ fontSize: 22, color: "#64748b", lineHeight: 1.5 }}>
+            Desarrollador Full-Stack especializado en
+          </span>
+          <span style={{ fontSize: 22, color: "#cbd5e1", lineHeight: 1.5 }}>
+            Java · Spring Boot · Next.js
+          </span>
         </div>
 
         {/* Tech tags */}
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {["Java 21", "Spring Boot", "Next.js", "TypeScript", "PostgreSQL", "Docker"].map(
             (tag) => (
               <div
                 key={tag}
                 style={{
+                  display: "flex",
                   padding: "6px 14px",
                   borderRadius: 8,
                   background: "rgba(30,41,59,0.8)",
@@ -136,6 +164,7 @@ export default function Image() {
             position: "absolute",
             bottom: 48,
             right: 80,
+            display: "flex",
             color: "#334155",
             fontSize: 16,
             fontFamily: "monospace",
