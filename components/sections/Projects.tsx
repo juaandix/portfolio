@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { ExternalLink, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import { GithubIcon } from "@/components/ui/SocialIcons";
 import { Reveal } from "@/components/ui/Reveal";
@@ -9,16 +9,6 @@ import { Reveal } from "@/components/ui/Reveal";
 interface Screenshot {
   src: string;
   alt: string;
-}
-
-interface Project {
-  name: string;
-  description: string;
-  tags: string[];
-  github?: string;
-  demo?: string;
-  highlight?: boolean;
-  screenshots?: Screenshot[];
 }
 
 interface FeatureHighlight {
@@ -29,6 +19,97 @@ interface FeatureHighlight {
   description: string;
   points: string[];
 }
+
+const KICKSCONTROL_SCREENSHOTS: Screenshot[] = [
+  { src: "/kickscontrol/01-hero-desktop.png", alt: "Tienda" },
+  { src: "/kickscontrol/02-catalog-grid.png", alt: "Catálogo" },
+  { src: "/kickscontrol/04-product-detail-selected.png", alt: "Producto" },
+  { src: "/kickscontrol/08-cart-drawer.png", alt: "Carrito" },
+  { src: "/kickscontrol/10-checkout-payment.png", alt: "Checkout" },
+  { src: "/kickscontrol/06-backoffice-dashboard-full.png", alt: "KPI Dashboard" },
+  { src: "/kickscontrol/07-backoffice-inventory.png", alt: "Inventario" },
+];
+
+const KICKS_FEATURE_HIGHLIGHTS: FeatureHighlight[] = [
+  {
+    id: "store",
+    label: "Tienda",
+    screenshotIndex: 0,
+    heading: "E-commerce completo",
+    description:
+      "Catálogo de sneakers con carrito persistente en servidor, checkout transaccional y pasarela de pago simulada con descarga de recibo en PDF. Sin localStorage — el estado del carrito se sincroniza entre pestañas y dispositivos.",
+    points: [
+      "Carrito como estado de servidor (TanStack Query)",
+      "Sincronización entre pestañas y dispositivos",
+      "Pasarela simulada + descarga de recibo PDF",
+    ],
+  },
+  {
+    id: "catalog",
+    label: "Catálogo",
+    screenshotIndex: 1,
+    heading: "Filtros dinámicos con JPA Specifications",
+    description:
+      "Hasta 7 filtros combinables (marca, talla, color, género, in-stock…) construidos dinámicamente con la Criteria API. Los filtros se almacenan en la URL — el catálogo es bookmarkeable y compartible con estado activo.",
+    points: [
+      "7 filtros combinables sin 127 métodos de repo",
+      "Subqueries EXISTS por talla para evitar duplicados",
+      "URL state — bookmarkeable y compartible",
+    ],
+  },
+  {
+    id: "product",
+    label: "Producto",
+    screenshotIndex: 2,
+    heading: "Variantes reales por talla y color",
+    description:
+      "Cada sneaker tiene variantes independientes con su propio SKU, stock y modificador de precio. El selector muestra el estado de stock en tiempo real por variante y el checkout descuenta la variante exacta.",
+    points: [
+      "SKU único por talla + color",
+      "Stock en tiempo real por variante",
+      "Modificador de precio por variante",
+    ],
+  },
+  {
+    id: "checkout",
+    label: "Checkout",
+    screenshotIndex: 4,
+    heading: "Defensa en 3 capas contra overselling",
+    description:
+      "Optimistic Lock (@Version), Pessimistic Lock (SELECT FOR UPDATE) y CHECK constraint de BD actúan dentro de un único método @Transactional. Ningún bug de aplicación puede generar stock negativo.",
+    points: [
+      "@Version — Hibernate rechaza el segundo UPDATE",
+      "SELECT FOR UPDATE — bloqueo a nivel de fila",
+      "CHECK stock_quantity >= 0 — última línea de defensa",
+    ],
+  },
+  {
+    id: "dashboard",
+    label: "KPI Dashboard",
+    screenshotIndex: 5,
+    heading: "KPIs de operaciones retail reales",
+    description:
+      "Las métricas no son genéricas: son las que se usan en turno real. Sell-Through Rate, Días de Cobertura y Tasa de Merma con rango de fechas configurable y granularidad día / semana / mes.",
+    points: [
+      "Sell-Through Rate: vendidas / (vendidas + stock)",
+      "Días de Cobertura: stock / ventas diarias medias",
+      "Tasa de Merma: ajustes negativos / total movimientos",
+    ],
+  },
+  {
+    id: "inventory",
+    label: "Inventario",
+    screenshotIndex: 6,
+    heading: "Gestión de inventario por variante",
+    description:
+      "Tabla expandible por modelo con modal de ajuste de stock en delta (+/-). Cada movimiento registra el motivo (RECEPCIÓN / AJUSTE / MERMA / DEVOLUCIÓN) para alimentar la Tasa de Merma del dashboard.",
+    points: [
+      "Ajuste de stock con delta y motivo tipado",
+      "Alertas de stock bajo por variante",
+      "Historial de movimientos para auditoría",
+    ],
+  },
+];
 
 const PRODSYNC_SCREENSHOTS: Screenshot[] = [
   { src: "/screenshots/01-login.png", alt: "Login" },
@@ -123,17 +204,6 @@ const FEATURE_HIGHLIGHTS: FeatureHighlight[] = [
   },
 ];
 
-const projects: Project[] = [
-  {
-    name: "KicksControl",
-    description:
-      "E-commerce y backoffice inteligente para una tienda de zapatillas. Backend con Java 21 + Spring Boot 3, frontend en Next.js 15, PostgreSQL, Docker Compose, autenticación JWT y gestión completa de inventario con alertas de stock.",
-    tags: ["Java 21", "Spring Boot", "Next.js 15", "PostgreSQL", "Docker", "JWT"],
-    github: "https://github.com/juaandix/kickscontrol",
-    highlight: true,
-  },
-];
-
 export default function Projects() {
   return (
     <section id="projects" className="py-28 px-6 relative">
@@ -144,14 +214,7 @@ export default function Projects() {
 
         <div className="mt-12 space-y-5">
           <Reveal delay={80}><ProdSyncCard /></Reveal>
-
-          <div className="grid md:grid-cols-2 gap-5">
-            {projects.map((project, i) => (
-              <Reveal key={project.name} delay={80 + i * 100}>
-                <ProjectCard project={project} />
-              </Reveal>
-            ))}
-          </div>
+          <Reveal delay={120}><KicksControlCard /></Reveal>
         </div>
       </div>
     </section>
@@ -378,70 +441,224 @@ function ProdSyncCard() {
   );
 }
 
-function ProjectCard({ project }: { project: Project }) {
+function KicksControlCard() {
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [lightbox, setLightbox] = useState<number | null>(null);
+  const total = KICKSCONTROL_SCREENSHOTS.length;
+
+  const currentFeature = KICKS_FEATURE_HIGHLIGHTS[activeFeature];
+  const screenshotIndex = currentFeature.screenshotIndex;
+
+  const prevLightbox = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      setLightbox((l) => (l !== null ? (l - 1 + total) % total : null));
+    },
+    [total]
+  );
+
+  const nextLightbox = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      setLightbox((l) => (l !== null ? (l + 1) % total : null));
+    },
+    [total]
+  );
+
+  useEffect(() => {
+    if (lightbox === null) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(null);
+      if (e.key === "ArrowLeft") prevLightbox();
+      if (e.key === "ArrowRight") nextLightbox();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [lightbox, prevLightbox, nextLightbox]);
+
   return (
-    <div
-      className={`group relative flex flex-col rounded-2xl border transition-all duration-300 hover:-translate-y-1.5 p-6 ${
-        project.highlight
-          ? "bg-gradient-to-br from-slate-900 to-slate-900/60 border-blue-500/30 hover:border-blue-500/60 hover:shadow-2xl hover:shadow-blue-500/10"
-          : "bg-slate-900/60 border-slate-800/80 hover:border-slate-700 hover:shadow-xl hover:shadow-black/40"
-      }`}
-      style={{ backdropFilter: "blur(8px)" }}
-    >
-      {project.highlight && (
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none" />
-      )}
+    <>
+      <div
+        className="group relative rounded-2xl border border-orange-500/20 bg-gradient-to-br from-slate-900 to-slate-900/60 hover:border-orange-500/40 hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 overflow-hidden"
+        style={{ backdropFilter: "blur(8px)" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none" />
 
-      {project.highlight && (
-        <span className="absolute top-4 right-4 text-[10px] font-mono uppercase tracking-widest text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full">
-          Destacado
-        </span>
-      )}
+        {/* Header */}
+        <div className="relative px-6 pt-6 pb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b border-slate-800/50">
+          <div className="flex-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-full">
+              Full-Stack · Java + Next.js
+            </span>
+            <h3 className="text-xl font-semibold text-slate-100 mt-2 mb-2 group-hover:text-white transition-colors">
+              KicksControl
+            </h3>
+            <p className="text-sm text-slate-500 leading-relaxed max-w-2xl group-hover:text-slate-400 transition-colors">
+              E-commerce y backoffice de gestión de sneakers con lógica de operaciones retail real.
+              Checkout transaccional con defensa en 3 capas contra overselling, KPIs de turno
+              (Sell-Through, Días de Cobertura, Merma) y variantes de producto por talla y color.
+            </p>
+          </div>
+          <div className="flex items-center gap-4 shrink-0 pt-1">
+            <a
+              href="https://github.com/juaandix/kickscontrol"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-orange-400 transition-colors"
+            >
+              <GithubIcon size={14} />
+              Código
+            </a>
+          </div>
+        </div>
 
-      <h3 className="text-base font-semibold text-slate-100 mb-3 pr-16 group-hover:text-white transition-colors">
-        {project.name}
-      </h3>
+        {/* Feature tabs */}
+        <div className="relative px-6 pt-4 pb-3">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {KICKS_FEATURE_HIGHLIGHTS.map((f, i) => (
+              <button
+                key={f.id}
+                onClick={() => setActiveFeature(i)}
+                className={`shrink-0 text-[11px] font-mono px-3 py-1 rounded-lg border transition-all duration-200 ${
+                  i === activeFeature
+                    ? "bg-orange-500/15 border-orange-500/40 text-orange-300"
+                    : "bg-slate-800/50 border-slate-700/50 text-slate-500 hover:text-slate-300 hover:border-slate-600"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-      <p className="text-sm text-slate-500 leading-relaxed flex-1 mb-5 group-hover:text-slate-400 transition-colors">
-        {project.description}
-      </p>
+        {/* Feature content */}
+        <div className="flex flex-col lg:flex-row">
+          {/* Screenshot */}
+          <div className="relative lg:w-[58%] shrink-0 bg-slate-950/60 overflow-hidden">
+            <div
+              className="relative aspect-video cursor-zoom-in"
+              onClick={() => setLightbox(screenshotIndex)}
+            >
+              <Image
+                key={screenshotIndex}
+                src={KICKSCONTROL_SCREENSHOTS[screenshotIndex].src}
+                alt={KICKSCONTROL_SCREENSHOTS[screenshotIndex].alt}
+                fill
+                className="object-cover object-top transition-opacity duration-300"
+                sizes="(max-width: 1024px) 100vw, 58vw"
+                quality={82}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+              <span className="absolute bottom-3 left-3 text-[10px] font-mono text-slate-300 bg-slate-950/70 px-2 py-0.5 rounded-md backdrop-blur-sm">
+                {KICKSCONTROL_SCREENSHOTS[screenshotIndex].alt}
+              </span>
+              <span className="absolute top-3 right-3 text-[10px] font-mono text-slate-400 bg-slate-950/60 px-2 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                ampliar
+              </span>
+            </div>
+          </div>
 
-      <div className="flex flex-wrap gap-1.5 mb-5">
-        {project.tags.map((tag) => (
-          <span
-            key={tag}
-            className="text-[11px] px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/50 text-slate-400"
-          >
-            {tag}
-          </span>
-        ))}
+          {/* Feature description */}
+          <div className="relative flex flex-col p-6 lg:p-7 flex-1 justify-center min-h-[180px]">
+            <h4 className="text-base font-semibold text-slate-100 mb-2 group-hover:text-white transition-colors">
+              {currentFeature.heading}
+            </h4>
+            <p className="text-sm text-slate-500 leading-relaxed mb-4 group-hover:text-slate-400 transition-colors">
+              {currentFeature.description}
+            </p>
+            <ul className="space-y-2">
+              {currentFeature.points.map((point) => (
+                <li key={point} className="flex items-start gap-2 text-xs text-slate-500 group-hover:text-slate-400 transition-colors">
+                  <span className="w-1 h-1 rounded-full bg-orange-400/60 shrink-0 mt-1.5" />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Tags footer */}
+        <div className="relative px-6 pb-5 pt-4 border-t border-slate-800/50">
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              "Java 17",
+              "Spring Boot 3.5",
+              "Next.js 16",
+              "React 19",
+              "TypeScript",
+              "PostgreSQL 16",
+              "Docker",
+              "JWT",
+              "TanStack Query v5",
+              "Recharts",
+              "Playwright",
+            ].map((tag) => (
+              <span
+                key={tag}
+                className="text-[11px] px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/50 text-slate-400"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4 mt-auto">
-        {project.github && (
-          <a
-            href={project.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-400 transition-colors"
+      {/* Lightbox */}
+      {lightbox !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            className="absolute top-4 right-4 p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white transition-colors"
+            onClick={() => setLightbox(null)}
+            aria-label="Cerrar"
           >
-            <GithubIcon size={14} />
-            Código
-          </a>
-        )}
-        {project.demo && (
-          <a
-            href={project.demo}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-400 transition-colors"
+            <X size={20} />
+          </button>
+
+          <button
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white transition-colors"
+            onClick={prevLightbox}
+            aria-label="Anterior"
           >
-            <ExternalLink size={14} />
-            Demo
-          </a>
-        )}
-      </div>
-    </div>
+            <ChevronLeft size={20} />
+          </button>
+
+          <div
+            className="relative w-full max-w-5xl mx-8 aspect-video"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={KICKSCONTROL_SCREENSHOTS[lightbox].src}
+              alt={KICKSCONTROL_SCREENSHOTS[lightbox].alt}
+              fill
+              className="object-contain"
+              sizes="100vw"
+              quality={90}
+            />
+          </div>
+
+          <button
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white transition-colors"
+            onClick={nextLightbox}
+            aria-label="Siguiente"
+          >
+            <ChevronRight size={20} />
+          </button>
+
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
+            <span className="text-xs font-mono text-slate-400">
+              {KICKSCONTROL_SCREENSHOTS[lightbox].alt}
+            </span>
+            <span className="text-xs font-mono text-slate-600">
+              {lightbox + 1} / {total}
+            </span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
