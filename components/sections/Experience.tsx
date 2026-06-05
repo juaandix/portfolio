@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 interface Job {
   role: string;
   company: string;
@@ -35,15 +37,16 @@ export default function Experience() {
   return (
     <section id="experience" className="py-28 px-6">
       <div className="max-w-5xl mx-auto">
-        <SectionLabel number="03">Experiencia</SectionLabel>
+        <Reveal><SectionLabel number="03">Experiencia</SectionLabel></Reveal>
 
         <div className="mt-12 space-y-0 relative">
           {/* Vertical line */}
           <div className="absolute left-[185px] top-0 bottom-0 w-px bg-gradient-to-b from-slate-800 via-slate-800 to-transparent hidden md:block" />
 
           {jobs.map((job, idx) => (
-            <div
+            <Reveal
               key={`${job.company}-${job.period}`}
+              delay={idx * 120}
               className={`grid md:grid-cols-[185px_1fr] gap-4 md:gap-8 ${
                 idx !== 0 ? "mt-12" : ""
               }`}
@@ -74,7 +77,7 @@ export default function Experience() {
                   </ul>
                 </div>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

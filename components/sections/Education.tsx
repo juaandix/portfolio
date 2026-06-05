@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/ui/Reveal";
+
 interface Degree {
   title: string;
   institution: string;
@@ -26,12 +28,13 @@ export default function Education() {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/20 to-transparent pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto">
-        <SectionLabel number="04">Educación</SectionLabel>
+        <Reveal><SectionLabel number="04">Educación</SectionLabel></Reveal>
 
         <div className="mt-12 grid md:grid-cols-2 gap-5">
-          {degrees.map((d) => (
-            <div
+          {degrees.map((d, i) => (
+            <Reveal
               key={d.institution}
+              delay={i * 120}
               className="group bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-200"
               style={{ backdropFilter: "blur(8px)" }}
             >
@@ -45,7 +48,7 @@ export default function Education() {
                   {d.detail}
                 </p>
               )}
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
