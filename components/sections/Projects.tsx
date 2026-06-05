@@ -21,6 +21,15 @@ interface Project {
   screenshots?: Screenshot[];
 }
 
+interface FeatureHighlight {
+  id: string;
+  label: string;
+  screenshotIndex: number;
+  heading: string;
+  description: string;
+  points: string[];
+}
+
 const PRODSYNC_SCREENSHOTS: Screenshot[] = [
   { src: "/screenshots/01-login.png", alt: "Login" },
   { src: "/screenshots/02-dashboard.png", alt: "Dashboard" },
@@ -31,6 +40,87 @@ const PRODSYNC_SCREENSHOTS: Screenshot[] = [
   { src: "/screenshots/07-reports.png", alt: "Reportes" },
   { src: "/screenshots/08-calendar.png", alt: "Calendario" },
   { src: "/screenshots/09-budgets.png", alt: "Presupuestos" },
+];
+
+const FEATURE_HIGHLIGHTS: FeatureHighlight[] = [
+  {
+    id: "auth",
+    label: "Autenticación",
+    screenshotIndex: 0,
+    heading: "JWT + RBAC",
+    description:
+      "Token firmado (HS256, 1 h de validez) almacenado en cookie HttpOnly. Un middleware de Next.js protege todas las rutas privadas sin llamadas extra al servidor. Tres roles con permisos granulares.",
+    points: [
+      "Cookie HttpOnly — inaccesible desde JS",
+      "Middleware Next.js sin round-trip al backend",
+      "Roles: ADMIN · OPERATOR · USER",
+    ],
+  },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    screenshotIndex: 1,
+    heading: "Dashboard adaptado por rol",
+    description:
+      "El ADMIN ve KPIs globales del equipo: proyectos activos, horas totales y rentabilidad. El USER solo accede a sus propias métricas y tareas pendientes. Sin lógica de permisos en el cliente.",
+    points: [
+      "Métricas de equipo para ADMIN",
+      "Vista personal para USER",
+      "Skeleton loaders en toda la app",
+    ],
+  },
+  {
+    id: "projects",
+    label: "Proyectos",
+    screenshotIndex: 2,
+    heading: "Gestión de proyectos",
+    description:
+      "CRUD completo con fechas, estado y cliente asociado. El estado pasa automáticamente a COMPLETADO en el backend cuando todas las tareas vinculadas se cierran, sin intervención manual.",
+    points: [
+      "Estado automático al completar tareas",
+      "Vinculación cliente → proyecto → tarea",
+      "Historial de actividad por proyecto",
+    ],
+  },
+  {
+    id: "time",
+    label: "Horas",
+    screenshotIndex: 4,
+    heading: "Registro de imputaciones",
+    description:
+      "Imputación de tiempo por tarea, usuario y tipo de actividad. La validación con Zod acepta múltiples formatos de hora sin fricción para el usuario. TanStack Query gestiona la invalidación de caché.",
+    points: [
+      "Formatos: 1.5 · 1h30m · 1:30",
+      "Por tipo: desarrollo, reunión, etc.",
+      "Invalidación de caché con TanStack Query",
+    ],
+  },
+  {
+    id: "reports",
+    label: "Reportes",
+    screenshotIndex: 6,
+    heading: "Informes exportables",
+    description:
+      "Informes de tiempo filtrables por proyecto, usuario, tipo y período. Exportación directa a CSV desde la interfaz, sin librerías externas — generado en el cliente con Blob y URL.createObjectURL.",
+    points: [
+      "Filtros combinados en tiempo real",
+      "Exportación CSV nativa sin librerías",
+      "Agrupación por período y tipo",
+    ],
+  },
+  {
+    id: "budgets",
+    label: "Presupuestos",
+    screenshotIndex: 8,
+    heading: "Control de rentabilidad",
+    description:
+      "Presupuestos con líneas por categoría. Calcula automáticamente la rentabilidad real comparando horas registradas con horas presupuestadas, detectando desviaciones por proyecto.",
+    points: [
+      "Horas presupuestadas vs. registradas",
+      "Desviación calculada automáticamente",
+      "Desglose por categoría de gasto",
+    ],
+  },
 ];
 
 const projects: Project[] = [
@@ -69,25 +159,12 @@ export default function Projects() {
 }
 
 function ProdSyncCard() {
-  const [current, setCurrent] = useState(0);
+  const [activeFeature, setActiveFeature] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const total = PRODSYNC_SCREENSHOTS.length;
 
-  const prev = useCallback(
-    (e?: React.MouseEvent) => {
-      e?.stopPropagation();
-      setCurrent((c) => (c - 1 + total) % total);
-    },
-    [total]
-  );
-
-  const next = useCallback(
-    (e?: React.MouseEvent) => {
-      e?.stopPropagation();
-      setCurrent((c) => (c + 1) % total);
-    },
-    [total]
-  );
+  const currentFeature = FEATURE_HIGHLIGHTS[activeFeature];
+  const screenshotIndex = currentFeature.screenshotIndex;
 
   const prevLightbox = useCallback(
     (e?: React.MouseEvent) => {
@@ -124,137 +201,121 @@ function ProdSyncCard() {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none" />
 
+        {/* Header */}
+        <div className="relative px-6 pt-6 pb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b border-slate-800/50">
+          <div className="flex-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full">
+              TFG · Con Distinción
+            </span>
+            <h3 className="text-xl font-semibold text-slate-100 mt-2 mb-2 group-hover:text-white transition-colors">
+              ProdSync
+            </h3>
+            <p className="text-sm text-slate-500 leading-relaxed max-w-2xl group-hover:text-slate-400 transition-colors">
+              Aplicación B2B de gestión de proyectos para equipos de software. CRUD completo de
+              clientes, proyectos, tareas e imputaciones de tiempo con control de acceso por rol
+              (RBAC), presupuestos y reportes exportables. TFG de DAW con Spring Boot + Next.js.
+            </p>
+          </div>
+          <div className="flex items-center gap-4 shrink-0 pt-1">
+            <a
+              href="https://github.com/juaandix/ProdSync"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-400 transition-colors"
+            >
+              <GithubIcon size={14} />
+              Código
+            </a>
+          </div>
+        </div>
+
+        {/* Feature tabs */}
+        <div className="relative px-6 pt-4 pb-3">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {FEATURE_HIGHLIGHTS.map((f, i) => (
+              <button
+                key={f.id}
+                onClick={() => setActiveFeature(i)}
+                className={`shrink-0 text-[11px] font-mono px-3 py-1 rounded-lg border transition-all duration-200 ${
+                  i === activeFeature
+                    ? "bg-blue-500/15 border-blue-500/40 text-blue-300"
+                    : "bg-slate-800/50 border-slate-700/50 text-slate-500 hover:text-slate-300 hover:border-slate-600"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Feature content */}
         <div className="flex flex-col lg:flex-row">
-          {/* Carousel */}
+          {/* Screenshot */}
           <div className="relative lg:w-[58%] shrink-0 bg-slate-950/60 overflow-hidden">
             <div
               className="relative aspect-video cursor-zoom-in"
-              onClick={() => setLightbox(current)}
+              onClick={() => setLightbox(screenshotIndex)}
             >
               <Image
-                src={PRODSYNC_SCREENSHOTS[current].src}
-                alt={PRODSYNC_SCREENSHOTS[current].alt}
+                key={screenshotIndex}
+                src={PRODSYNC_SCREENSHOTS[screenshotIndex].src}
+                alt={PRODSYNC_SCREENSHOTS[screenshotIndex].alt}
                 fill
                 className="object-cover object-top transition-opacity duration-300"
                 sizes="(max-width: 1024px) 100vw, 58vw"
                 quality={82}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
-
-              {/* Screen label */}
               <span className="absolute bottom-3 left-3 text-[10px] font-mono text-slate-300 bg-slate-950/70 px-2 py-0.5 rounded-md backdrop-blur-sm">
-                {PRODSYNC_SCREENSHOTS[current].alt}
+                {PRODSYNC_SCREENSHOTS[screenshotIndex].alt}
               </span>
-
-              {/* Zoom hint */}
               <span className="absolute top-3 right-3 text-[10px] font-mono text-slate-400 bg-slate-950/60 px-2 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
                 ampliar
               </span>
             </div>
-
-            {/* Nav buttons */}
-            <button
-              onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-slate-950/70 border border-slate-700/50 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors backdrop-blur-sm"
-              aria-label="Anterior"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <button
-              onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-slate-950/70 border border-slate-700/50 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors backdrop-blur-sm"
-              aria-label="Siguiente"
-            >
-              <ChevronRight size={16} />
-            </button>
-
-            {/* Dots */}
-            <div className="absolute bottom-3 right-3 flex gap-1">
-              {PRODSYNC_SCREENSHOTS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrent(i);
-                  }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
-                    i === current
-                      ? "bg-blue-400 scale-125"
-                      : "bg-slate-600 hover:bg-slate-400"
-                  }`}
-                  aria-label={`Ir a ${PRODSYNC_SCREENSHOTS[i].alt}`}
-                />
-              ))}
-            </div>
           </div>
 
-          {/* Info */}
-          <div className="relative flex flex-col p-6 lg:p-8 flex-1">
-            <div className="flex items-start justify-between mb-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full">
-                TFG · Con Distinción
-              </span>
-            </div>
-
-            <h3 className="text-xl font-semibold text-slate-100 mt-3 mb-3 group-hover:text-white transition-colors">
-              ProdSync
-            </h3>
-
-            <p className="text-sm text-slate-500 leading-relaxed mb-5 group-hover:text-slate-400 transition-colors">
-              Aplicación B2B de gestión de proyectos para empresas de software.
-              Incluye gestión de sprints, tareas, equipos, clientes,
-              presupuestos, registro de horas, calendario y reportes. Desarrollada
-              con Spring Boot + React como Trabajo de Fin de Grado de DAW.
+          {/* Feature description */}
+          <div className="relative flex flex-col p-6 lg:p-7 flex-1 justify-center min-h-[180px]">
+            <h4 className="text-base font-semibold text-slate-100 mb-2 group-hover:text-white transition-colors">
+              {currentFeature.heading}
+            </h4>
+            <p className="text-sm text-slate-500 leading-relaxed mb-4 group-hover:text-slate-400 transition-colors">
+              {currentFeature.description}
             </p>
-
-            {/* Thumbnail strip */}
-            <div className="flex gap-1.5 mb-5 overflow-x-auto pb-1 scrollbar-none">
-              {PRODSYNC_SCREENSHOTS.map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrent(i)}
-                  className={`relative shrink-0 w-14 h-9 rounded overflow-hidden border transition-all ${
-                    i === current
-                      ? "border-blue-400 ring-1 ring-blue-400/50"
-                      : "border-slate-700/50 opacity-60 hover:opacity-100"
-                  }`}
-                >
-                  <Image
-                    src={s.src}
-                    alt={s.alt}
-                    fill
-                    className="object-cover object-top"
-                    sizes="56px"
-                    quality={50}
-                  />
-                </button>
+            <ul className="space-y-2">
+              {currentFeature.points.map((point) => (
+                <li key={point} className="flex items-start gap-2 text-xs text-slate-500 group-hover:text-slate-400 transition-colors">
+                  <span className="w-1 h-1 rounded-full bg-blue-400/60 shrink-0 mt-1.5" />
+                  {point}
+                </li>
               ))}
-            </div>
+            </ul>
+          </div>
+        </div>
 
-            <div className="flex flex-wrap gap-1.5 mb-6">
-              {["Spring Boot", "React", "TypeScript", "PostgreSQL", "Docker"].map(
-                (tag) => (
-                  <span
-                    key={tag}
-                    className="text-[11px] px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/50 text-slate-400"
-                  >
-                    {tag}
-                  </span>
-                )
-              )}
-            </div>
-
-            <div className="flex items-center gap-4 mt-auto">
-              <a
-                href="https://github.com/juaandix/ProdSync"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-400 transition-colors"
+        {/* Tags footer */}
+        <div className="relative px-6 pb-5 pt-4 border-t border-slate-800/50">
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              "Spring Boot 3",
+              "Next.js 15",
+              "React 19",
+              "TypeScript",
+              "PostgreSQL",
+              "Docker",
+              "JWT",
+              "TanStack Query",
+              "Zod",
+              "Playwright",
+            ].map((tag) => (
+              <span
+                key={tag}
+                className="text-[11px] px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/50 text-slate-400"
               >
-                <GithubIcon size={14} />
-                Código
-              </a>
-            </div>
+                {tag}
+              </span>
+            ))}
           </div>
         </div>
       </div>
