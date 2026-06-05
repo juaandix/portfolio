@@ -42,13 +42,6 @@ const projects: Project[] = [
     github: "https://github.com/juaandix/kickscontrol",
     highlight: true,
   },
-  {
-    name: "MobileHoursApp",
-    description:
-      "App móvil para registro y control de horas de trabajo. Desarrollada con tecnologías móviles para simplificar el seguimiento de jornadas laborales.",
-    tags: ["Mobile", "React Native", "API REST"],
-    github: "https://github.com/juaandix/MobileHoursApp",
-  },
 ];
 
 export default function Projects() {
