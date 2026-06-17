@@ -111,6 +111,83 @@ const KICKS_FEATURE_HIGHLIGHTS: FeatureHighlight[] = [
   },
 ];
 
+const DOCUMIND_SCREENSHOTS: Screenshot[] = [
+  { src: "/documind/02_dashboard.png", alt: "Dashboard" },
+  { src: "/documind/04_documents.png", alt: "Documentos" },
+  { src: "/documind/05_documents_filtered.png", alt: "Filtros" },
+  { src: "/documind/07c_room_engineering.png", alt: "Chat RAG" },
+  { src: "/documind/09_members.png", alt: "Workspace" },
+  { src: "/documind/admin_02_dashboard.png", alt: "Admin Panel" },
+];
+
+const DOCUMIND_FEATURE_HIGHLIGHTS: FeatureHighlight[] = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    screenshotIndex: 0,
+    heading: "Multi-tenant workspace",
+    description:
+      "Cada empresa tiene su propio workspace aislado. El registro crea usuario + workspace en una sola transacción. JWT con roles por workspace (OWNER / ADMIN / MEMBER) y rol de plataforma PLATFORM_ADMIN.",
+    points: [
+      "Aislamiento por workspace_id en todos los queries",
+      "JWT access (60 min) + refresh (30 días)",
+      "Roles: OWNER · ADMIN · MEMBER · PLATFORM_ADMIN",
+    ],
+  },
+  {
+    id: "documents",
+    label: "Documentos",
+    screenshotIndex: 1,
+    heading: "Pipeline RAG con Celery",
+    description:
+      "Subida con drag & drop y barra de progreso real. El procesamiento es completamente async: Celery extrae texto, chunkea (~500 tokens, overlap 50), genera embeddings y los indexa en MongoDB Atlas vectorSearch.",
+    points: [
+      "Chunking 500 tokens con overlap de 50",
+      "Embeddings OpenAI text-embedding-3-small (1536 dims)",
+      "Polling UPLOADING → PROCESSING → READY / ERROR",
+    ],
+  },
+  {
+    id: "rag",
+    label: "Chat RAG",
+    screenshotIndex: 3,
+    heading: "Respuestas en streaming con fuentes",
+    description:
+      "El pipeline busca los K chunks más similares por coseno filtrados por workspace y documentos de la sala, los inyecta como contexto en el LLM y emite la respuesta token a token por WebSocket. Cada mensaje cita los fragmentos fuente con su score.",
+    points: [
+      "vectorSearch MongoDB Atlas + filtro por workspace",
+      "Streaming token a token por WebSocket",
+      "Fuentes citadas con score de similitud",
+    ],
+  },
+  {
+    id: "workspace",
+    label: "Workspace",
+    screenshotIndex: 4,
+    heading: "Colaboración y notificaciones",
+    description:
+      "Invitación de miembros por token de un solo uso (7 días). Notificaciones en tiempo real: FastAPI publica en Redis pub/sub → Node.js consume → broadcast por WebSocket. Emails HTML de invitación con Nodemailer.",
+    points: [
+      "Invitación por token de un solo uso (7 días)",
+      "Redis pub/sub como bus de eventos entre servicios",
+      "Centro de notificaciones con badge de no leídas",
+    ],
+  },
+  {
+    id: "admin",
+    label: "Admin Panel",
+    screenshotIndex: 5,
+    heading: "Panel Angular con NgRx",
+    description:
+      "Panel independiente en Angular 17 con Standalone Components y NgRx. Métricas globales de la plataforma, gráfico de actividad de 7 días, listado de usuarios con última conexión y logs de auditoría filtrable por estado HTTP.",
+    points: [
+      "NgRx store / effects / selectors para estado global",
+      "Chart.js — bar chart + doughnut de distribución",
+      "Logs de auditoría con filtro por HTTP status",
+    ],
+  },
+];
+
 const PRODSYNC_SCREENSHOTS: Screenshot[] = [
   { src: "/screenshots/01-login.png", alt: "Login" },
   { src: "/screenshots/02-dashboard.png", alt: "Dashboard" },
@@ -213,11 +290,235 @@ export default function Projects() {
         <Reveal><SectionLabel number="02">Proyectos</SectionLabel></Reveal>
 
         <div className="mt-12 space-y-5">
-          <Reveal delay={80}><ProdSyncCard /></Reveal>
-          <Reveal delay={120}><KicksControlCard /></Reveal>
+          <Reveal delay={80}><DocuMindCard /></Reveal>
+          <Reveal delay={120}><ProdSyncCard /></Reveal>
+          <Reveal delay={160}><KicksControlCard /></Reveal>
         </div>
       </div>
     </section>
+  );
+}
+
+function DocuMindCard() {
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [lightbox, setLightbox] = useState<number | null>(null);
+  const total = DOCUMIND_SCREENSHOTS.length;
+
+  const currentFeature = DOCUMIND_FEATURE_HIGHLIGHTS[activeFeature];
+  const screenshotIndex = currentFeature.screenshotIndex;
+
+  const prevLightbox = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      setLightbox((l) => (l !== null ? (l - 1 + total) % total : null));
+    },
+    [total]
+  );
+
+  const nextLightbox = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      setLightbox((l) => (l !== null ? (l + 1) % total : null));
+    },
+    [total]
+  );
+
+  useEffect(() => {
+    if (lightbox === null) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(null);
+      if (e.key === "ArrowLeft") prevLightbox();
+      if (e.key === "ArrowRight") nextLightbox();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [lightbox, prevLightbox, nextLightbox]);
+
+  return (
+    <>
+      <div
+        className="group relative rounded-2xl border border-violet-500/20 bg-gradient-to-br from-slate-900 to-slate-900/60 hover:border-violet-500/40 hover:shadow-2xl hover:shadow-violet-500/10 transition-all duration-300 overflow-hidden"
+        style={{ backdropFilter: "blur(8px)" }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent pointer-events-none" />
+
+        {/* Header */}
+        <div className="relative px-6 pt-6 pb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b border-slate-800/50">
+          <div className="flex-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-violet-400 bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 rounded-full">
+              SaaS · IA · Microservicios
+            </span>
+            <h3 className="text-xl font-semibold text-slate-100 mt-2 mb-2 group-hover:text-white transition-colors">
+              DocuMind
+            </h3>
+            <p className="text-sm text-slate-500 leading-relaxed max-w-2xl group-hover:text-slate-400 transition-colors">
+              Plataforma SaaS de análisis de documentos con IA. Los usuarios suben documentos,
+              los interrogan mediante chat con RAG (LangChain + MongoDB vectorSearch) y colaboran
+              en tiempo real dentro de un workspace multi-tenant. Microservicio de notificaciones
+              en Node.js, panel admin en Angular 17 y procesamiento async con Celery.
+            </p>
+          </div>
+          <div className="flex items-center gap-4 shrink-0 pt-1">
+            <a
+              href="https://github.com/juaandix/documind"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-violet-400 transition-colors"
+            >
+              <GithubIcon size={14} />
+              Código
+            </a>
+          </div>
+        </div>
+
+        {/* Feature tabs */}
+        <div className="relative px-6 pt-4 pb-3">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {DOCUMIND_FEATURE_HIGHLIGHTS.map((f, i) => (
+              <button
+                key={f.id}
+                onClick={() => setActiveFeature(i)}
+                className={`shrink-0 text-[11px] font-mono px-3 py-1 rounded-lg border transition-all duration-200 ${
+                  i === activeFeature
+                    ? "bg-violet-500/15 border-violet-500/40 text-violet-300"
+                    : "bg-slate-800/50 border-slate-700/50 text-slate-500 hover:text-slate-300 hover:border-slate-600"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Feature content */}
+        <div className="flex flex-col lg:flex-row">
+          {/* Screenshot */}
+          <div className="relative lg:w-[58%] shrink-0 bg-slate-950/60 overflow-hidden">
+            <div
+              className="relative aspect-video cursor-zoom-in"
+              onClick={() => setLightbox(screenshotIndex)}
+            >
+              <Image
+                key={screenshotIndex}
+                src={DOCUMIND_SCREENSHOTS[screenshotIndex].src}
+                alt={DOCUMIND_SCREENSHOTS[screenshotIndex].alt}
+                fill
+                className="object-cover object-top transition-opacity duration-300"
+                sizes="(max-width: 1024px) 100vw, 58vw"
+                quality={82}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+              <span className="absolute bottom-3 left-3 text-[10px] font-mono text-slate-300 bg-slate-950/70 px-2 py-0.5 rounded-md backdrop-blur-sm">
+                {DOCUMIND_SCREENSHOTS[screenshotIndex].alt}
+              </span>
+              <span className="absolute top-3 right-3 text-[10px] font-mono text-slate-400 bg-slate-950/60 px-2 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                ampliar
+              </span>
+            </div>
+          </div>
+
+          {/* Feature description */}
+          <div className="relative flex flex-col p-6 lg:p-7 flex-1 justify-center min-h-[180px]">
+            <h4 className="text-base font-semibold text-slate-100 mb-2 group-hover:text-white transition-colors">
+              {currentFeature.heading}
+            </h4>
+            <p className="text-sm text-slate-500 leading-relaxed mb-4 group-hover:text-slate-400 transition-colors">
+              {currentFeature.description}
+            </p>
+            <ul className="space-y-2">
+              {currentFeature.points.map((point) => (
+                <li key={point} className="flex items-start gap-2 text-xs text-slate-500 group-hover:text-slate-400 transition-colors">
+                  <span className="w-1 h-1 rounded-full bg-violet-400/60 shrink-0 mt-1.5" />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Tags footer */}
+        <div className="relative px-6 pb-5 pt-4 border-t border-slate-800/50">
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              "FastAPI",
+              "Python",
+              "LangChain",
+              "MongoDB Atlas",
+              "Vue.js 3",
+              "Angular 17",
+              "Node.js",
+              "Celery",
+              "Redis",
+              "WebSocket",
+              "Docker",
+              "JWT",
+            ].map((tag) => (
+              <span
+                key={tag}
+                className="text-[11px] px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/50 text-slate-400"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      {lightbox !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            className="absolute top-4 right-4 p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white transition-colors"
+            onClick={() => setLightbox(null)}
+            aria-label="Cerrar"
+          >
+            <X size={20} />
+          </button>
+
+          <button
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white transition-colors"
+            onClick={prevLightbox}
+            aria-label="Anterior"
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          <div
+            className="relative w-full max-w-5xl mx-8 aspect-video"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={DOCUMIND_SCREENSHOTS[lightbox].src}
+              alt={DOCUMIND_SCREENSHOTS[lightbox].alt}
+              fill
+              className="object-contain"
+              sizes="100vw"
+              quality={90}
+            />
+          </div>
+
+          <button
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white transition-colors"
+            onClick={nextLightbox}
+            aria-label="Siguiente"
+          >
+            <ChevronRight size={20} />
+          </button>
+
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
+            <span className="text-xs font-mono text-slate-400">
+              {DOCUMIND_SCREENSHOTS[lightbox].alt}
+            </span>
+            <span className="text-xs font-mono text-slate-600">
+              {lightbox + 1} / {total}
+            </span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
