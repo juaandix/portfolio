@@ -1,5 +1,6 @@
 import { ArrowDown, Mail, ArrowRight } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/SocialIcons";
+import ProjectCollage from "@/components/ui/ProjectCollage";
 
 export default function Hero() {
   return (
@@ -7,6 +8,9 @@ export default function Hero() {
       id="hero"
       className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
     >
+      {/* Collage of project screenshots */}
+      <ProjectCollage />
+
       {/* Background grid lines */}
       <div
         className="absolute inset-0 pointer-events-none opacity-30"

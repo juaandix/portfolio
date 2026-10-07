@@ -81,3 +81,24 @@ body {
   -webkit-text-fill-color: transparent;
   animation: gradient-shift 5s ease infinite;
 }
+
+/* Hero project collage drift (each row holds its images twice, so -50% loops seamlessly) */
+@keyframes collage-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.collage-drift {
+  animation: collage-drift 90s linear infinite;
+}
+
+.collage-drift-reverse {
+  animation: collage-drift 90s linear infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collage-drift,
+  .collage-drift-reverse {
+    animation: none;
+  }
+}
