@@ -1,6 +1,8 @@
 import { ArrowDown, Mail, ArrowRight } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/components/ui/SocialIcons";
 import ProjectCollage from "@/components/ui/ProjectCollage";
+import CodeCard from "@/components/ui/CodeCard";
+import TechLogos from "@/components/ui/TechLogos";
 
 export default function Hero() {
   return (
@@ -33,21 +35,23 @@ export default function Hero() {
         <div className="animate-fade-up inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/8 mb-6">
           <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
           <span className="text-blue-400 text-xs font-mono tracking-widest uppercase">
-            Software Developer
+            {"</>"} Portfolio
           </span>
         </div>
 
-        <h1 className="animate-fade-up-delay-1 text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.05]">
+        <h1 className="animate-fade-up-delay-1 text-5xl md:text-7xl font-bold tracking-tight mb-4 leading-[1.05]">
           Juan David{" "}
           <span className="gradient-text-animated">Gil Diaz</span>
         </h1>
 
-        <p className="animate-fade-up-delay-2 text-slate-400 text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-10">
-          Desarrollador Full-Stack especializado en{" "}
-          <span className="text-slate-200">Java · Spring Boot · Next.js</span>.
-          Construyo aplicaciones robustas con foco en rendimiento y experiencia
-          de usuario.
-        </p>
+        <h2 className="animate-fade-up-delay-1 font-mono text-xl md:text-3xl font-semibold tracking-tight text-slate-100 mb-8">
+          <span className="text-blue-400">&gt;</span> Desarrollador de Software
+          <span className="terminal-cursor text-blue-400">_</span>
+        </h2>
+
+        <CodeCard className="animate-fade-up-delay-2 max-w-lg mx-auto mb-6 text-[11px] sm:text-sm" />
+
+        <TechLogos className="animate-fade-up-delay-3 justify-center max-w-2xl mx-auto mb-10" />
 
         <div className="animate-fade-up-delay-3 flex flex-col sm:flex-row items-center justify-center gap-3 mb-14">
           <a

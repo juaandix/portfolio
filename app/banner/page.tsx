@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import ProjectCollage from "@/components/ui/ProjectCollage";
+import CodeCard from "@/components/ui/CodeCard";
+import TechLogos from "@/components/ui/TechLogos";
 
 export const metadata: Metadata = {
   title: "LinkedIn banner",
@@ -19,21 +21,27 @@ export default function Banner() {
         <ProjectCollage still lightShade tileWidth={300} />
 
         {/* Extra shade behind the text block */}
-        <div className="absolute inset-y-0 right-0 w-[62%] bg-gradient-to-l from-slate-950/95 via-slate-950/75 to-transparent" />
+        <div className="absolute inset-y-0 right-0 w-[85%] bg-gradient-to-l from-slate-950/95 via-slate-950/75 to-transparent" />
 
-        <div className="relative pr-24 text-right">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-            <span className="text-blue-400 text-xs font-mono tracking-widest uppercase">
-              Software Developer
-            </span>
+        <div className="relative flex items-center gap-12 pr-20">
+          <CodeCard title="juandavidgildiaz.dev" className="w-max shrink-0 text-[15px]" />
+
+          <div className="text-right">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+              <span className="text-blue-400 text-xs font-mono tracking-widest uppercase">
+                {"</>"} Software Developer
+              </span>
+            </div>
+            <h1 className="text-6xl font-bold tracking-tight leading-[1.05] mb-4">
+              Juan David <span className="gradient-text-animated">Gil Diaz</span>
+            </h1>
+            <p className="font-mono text-[26px] font-semibold tracking-tight text-slate-100">
+              <span className="text-blue-400">&gt;</span> Desarrollador de Software
+              <span className="text-blue-400">_</span>
+            </p>
+            <TechLogos className="justify-end mt-5 max-w-[560px] ml-auto" />
           </div>
-          <h1 className="text-6xl font-bold tracking-tight leading-[1.05] mb-4">
-            Juan David <span className="gradient-text-animated">Gil Diaz</span>
-          </h1>
-          <p className="text-slate-300 text-xl">
-            Full-Stack · <span className="text-slate-100">Java · Spring Boot · Next.js</span>
-          </p>
         </div>
       </div>
     </div>

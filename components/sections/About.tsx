@@ -1,37 +1,5 @@
-import {
-  SiSpringboot,
-  SiPostgresql,
-  SiDocker,
-  SiNextdotjs,
-  SiReact,
-  SiTypescript,
-  SiGit,
-} from "react-icons/si";
-import { Coffee, Globe, Users } from "lucide-react";
-import type { IconType } from "react-icons";
-import type { LucideIcon } from "lucide-react";
+import { skills } from "@/lib/skills";
 import { Reveal } from "@/components/ui/Reveal";
-
-type SkillIcon = IconType | LucideIcon;
-
-interface Skill {
-  name: string;
-  Icon: SkillIcon;
-  color: string;
-}
-
-const skills: Skill[] = [
-  { name: "Java",            Icon: Coffee,       color: "#e76f00" },
-  { name: "Spring Boot",     Icon: SiSpringboot, color: "#6db33f" },
-  { name: "PostgreSQL",      Icon: SiPostgresql, color: "#4169e1" },
-  { name: "Docker",          Icon: SiDocker,     color: "#2496ed" },
-  { name: "REST APIs",       Icon: Globe,        color: "#60a5fa" },
-  { name: "Next.js",         Icon: SiNextdotjs,  color: "#e2e8f0" },
-  { name: "React",           Icon: SiReact,      color: "#61dafb" },
-  { name: "TypeScript",      Icon: SiTypescript, color: "#3178c6" },
-  { name: "Git",             Icon: SiGit,        color: "#f05032" },
-  { name: "Team Leadership", Icon: Users,        color: "#94a3b8" },
-];
 
 export default function About() {
   return (
