@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./banner.css";
 import ProjectCollage from "@/components/ui/ProjectCollage";
 import CodeCard from "@/components/ui/CodeCard";
 import TechLogos from "@/components/ui/TechLogos";

@@ -1,121 +1,119 @@
-import { ArrowDown, Mail, ArrowRight } from "lucide-react";
-import { GithubIcon, LinkedinIcon } from "@/components/ui/SocialIcons";
-import ProjectCollage from "@/components/ui/ProjectCollage";
-import CodeCard from "@/components/ui/CodeCard";
-import TechLogos from "@/components/ui/TechLogos";
+import { ArrowRight, Download } from "lucide-react";
+import { LightFibers } from "@/components/ui/LightFibers";
+import { ProjectOrbit } from "@/components/ui/ProjectOrbit";
+
+const TECH = [
+  "Java 17", "Spring Boot 3", "Spring Security", "React 19", "Next.js", "TypeScript", "PostgreSQL",
+  "Docker", "Python", "FastAPI", "LangChain", "MongoDB Atlas", "Angular 17", "GitHub Actions", "Playwright",
+];
+
+/** Divide un texto en palabras que entran una a una. */
+function Words({ text, start = 0 }: { text: string; start?: number }) {
+  return (
+    <>
+      {text.split(" ").map((w, i) => (
+        <span key={i} className="word-in text-sheen -mb-[0.14em] pb-[0.14em]" style={{ ["--i" as string]: start + i }}>
+          {w}
+          {" "}
+        </span>
+      ))}
+    </>
+  );
+}
 
 export default function Hero() {
   return (
-    <section
-      id="hero"
-      className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
-    >
-      {/* Collage of project screenshots */}
-      <ProjectCollage />
-
-      {/* Background grid lines */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-30"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(148,163,184,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.06) 1px, transparent 1px)",
-          backgroundSize: "72px 72px",
-        }}
-      />
-
-      {/* Multi-layer glow */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] w-[700px] h-[700px] bg-blue-600/8 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] w-[380px] h-[380px] bg-blue-500/10 rounded-full blur-2xl" />
-        <div className="absolute top-1/2 left-[35%] -translate-x-1/2 -translate-y-[50%] w-[300px] h-[300px] bg-indigo-600/6 rounded-full blur-3xl" />
+    <section id="hero" className="relative isolate flex min-h-svh flex-col overflow-hidden">
+      {/* Luz: fibras animadas y dos halos */}
+      <div aria-hidden className="absolute inset-0 -z-10">
+        <div className="absolute -top-40 right-[-10%] h-[700px] w-[900px] rounded-full bg-violet/20 blur-[140px]" />
+        <div className="absolute bottom-[-20%] left-[-10%] h-[500px] w-[700px] rounded-full bg-cyan/10 blur-[140px]" />
+        <LightFibers className="absolute inset-0 h-full w-full opacity-50 md:opacity-90 [mask-image:linear-gradient(90deg,transparent_5%,rgba(0,0,0,0.35)_35%,#000_60%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-bg to-transparent" />
       </div>
 
-      <div className="relative max-w-3xl w-full text-center">
-        {/* Role badge */}
-        <div className="animate-fade-up inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/8 mb-6">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-          <span className="text-blue-400 text-xs font-mono tracking-widest uppercase">
-            {"</>"} Portfolio
+      <div className="mx-auto grid w-full max-w-[1400px] flex-1 items-center gap-10 px-5 pt-[calc(var(--nav)+48px)] pb-16 md:px-10 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+        <div className="word-in" style={{ ["--i" as string]: 0 }}>
+        <p className="inline-flex w-fit items-center gap-2.5 rounded-full glass px-4 py-1.5 text-[0.875rem] text-muted">
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-cyan opacity-60" />
+            <span className="relative inline-flex size-2 rounded-full bg-cyan" />
           </span>
+          Disponible ahora · Leganés, Madrid
+        </p>
         </div>
 
-        <h1 className="animate-fade-up-delay-1 text-5xl md:text-7xl font-bold tracking-tight mb-4 leading-[1.05]">
-          Juan David{" "}
-          <span className="gradient-text-animated">Gil Diaz</span>
+        <p
+          className="word-in mt-8 text-[clamp(1.75rem,1.1rem+2vw,2.75rem)] font-medium leading-tight tracking-[-0.03em] text-white"
+          style={{ ["--i" as string]: 1 }}
+        >
+          Juan David Gil
+          <span className="ml-3 align-middle font-mono text-[0.8125rem] font-normal uppercase tracking-[0.2em] text-violet">
+            Full Stack Developer
+          </span>
+        </p>
+
+        <h1 className="display mt-5 max-w-[16ch] text-[clamp(2.25rem,1rem+3.6vw,4.75rem)] leading-[1.06]">
+          <span className="sr-only">Software full-stack con Java y React</span>
+          <span aria-hidden>
+            <Words text="Software full-stack" start={2} />
+            <br />
+            <Words text="con Java y React" start={4} />
+          </span>
         </h1>
 
-        <h2 className="animate-fade-up-delay-1 font-mono text-xl md:text-3xl font-semibold tracking-tight text-slate-100 mb-8">
-          <span className="text-blue-400">&gt;</span> Desarrollador de Software
-          <span className="terminal-cursor text-blue-400">_</span>
-        </h2>
+        <p
+          className="word-in mt-8 max-w-[52ch] text-[1.125rem] text-[#b4b8c0] md:text-[1.25rem]"
+          style={{ ["--i" as string]: 7 }}
+        >
+          Spring Boot en el backend, React y TypeScript en el frontend y pipelines de IA con Python. Cinco años
+          dirigiendo turnos en tienda me enseñaron a construir software que se mide.
+        </p>
 
-        <CodeCard className="animate-fade-up-delay-2 max-w-lg mx-auto mb-6 text-[11px] sm:text-sm" />
-
-        <TechLogos className="animate-fade-up-delay-3 justify-center max-w-2xl mx-auto mb-10" />
-
-        <div className="animate-fade-up-delay-3 flex flex-col sm:flex-row items-center justify-center gap-3 mb-14">
+        <div className="word-in mt-10" style={{ ["--i" as string]: 8 }}>
+        <div className="flex flex-wrap items-center gap-3">
           <a
             href="#projects"
-            className="group inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-600/25 hover:-translate-y-0.5 w-full sm:w-auto justify-center"
+            className="group inline-flex h-13 items-center gap-3 rounded-full bg-white pl-6 pr-1.5 text-[1rem] font-medium text-black transition-transform active:scale-[0.97]"
           >
             Ver proyectos
-            <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
-          </a>
-          <a
-            href="#contact"
-            className="px-6 py-3 border border-slate-700 hover:border-slate-500 bg-slate-900/60 hover:bg-slate-800/60 text-slate-300 hover:text-slate-100 font-medium rounded-xl transition-all duration-200 hover:-translate-y-0.5 w-full sm:w-auto text-center"
-          >
-            Contacto
+            <span className="grid size-10 place-items-center rounded-full bg-black text-white transition-transform duration-300 group-hover:-rotate-45">
+              <ArrowRight size={18} />
+            </span>
           </a>
           <a
             href="/cv.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3 border border-slate-700 hover:border-slate-500 bg-slate-900/60 hover:bg-slate-800/60 text-slate-300 hover:text-slate-100 font-medium rounded-xl transition-all duration-200 hover:-translate-y-0.5 w-full sm:w-auto text-center"
+            className="inline-flex h-13 items-center gap-2 rounded-full glass px-6 text-[1rem] transition-colors hover:bg-white/10"
           >
+            <Download size={17} />
             Descargar CV
           </a>
         </div>
+        </div>
+        </div>
 
-        {/* Social links */}
-        <div className="animate-fade-up-delay-4 flex items-center justify-center gap-1">
-          <a
-            href="https://github.com/juaandix"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2.5 rounded-xl text-slate-500 hover:text-slate-100 hover:bg-slate-800 transition-all"
-            aria-label="GitHub"
-          >
-            <GithubIcon size={20} />
-          </a>
-          <a
-            href="https://linkedin.com/in/juaandix"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2.5 rounded-xl text-slate-500 hover:text-slate-100 hover:bg-slate-800 transition-all"
-            aria-label="LinkedIn"
-          >
-            <LinkedinIcon size={20} />
-          </a>
-          <a
-            href="mailto:juandavid.gilcv@gmail.com"
-            className="p-2.5 rounded-xl text-slate-500 hover:text-slate-100 hover:bg-slate-800 transition-all"
-            aria-label="Email"
-          >
-            <Mail size={20} />
-          </a>
+        {/* Tarjetas de proyectos girando */}
+        <div className="h-[340px] sm:h-[440px] lg:col-span-5 lg:-mr-[5vw] lg:h-[580px] lg:[mask-image:linear-gradient(90deg,transparent_0%,#000_16%,#000_90%,transparent_100%)]">
+          <div className="word-in h-full w-full" style={{ ["--i" as string]: 9 }}>
+            <ProjectOrbit className="h-full w-full" />
+          </div>
         </div>
       </div>
 
-      {/* Scroll hint */}
-      <a
-        href="#about"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-slate-600 hover:text-blue-400 transition-colors"
-        aria-label="Scroll down"
-      >
-        <span className="text-[10px] font-mono tracking-widest uppercase">scroll</span>
-        <ArrowDown size={16} className="animate-bounce" />
-      </a>
+      {/* Cinta de tecnologías */}
+      <div className="relative border-y border-line py-5 [mask-image:linear-gradient(90deg,transparent,#000_15%,#000_85%,transparent)]">
+        <ul className="marquee flex w-max gap-12 font-mono text-[0.875rem] uppercase tracking-[0.18em] text-muted" aria-label="Tecnologías">
+          {[...TECH, ...TECH].map((t, i) => (
+            <li key={i} className="flex items-center gap-12" aria-hidden={i >= TECH.length}>
+              {t}
+              <span className="size-1 rounded-full bg-violet/70" />
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

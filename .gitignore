@@ -43,3 +43,12 @@ next-env.d.ts
 # source assets already copied to public/
 /screenshots/
 /*.pdf
+
+# Salida local de la skill de diseño
+.taste-skill/
+.playwright-cli/
+
+# Material de referencia local (vídeos y CV fuente)
+*.MP4
+*.mp4
+/Juan David Gil Diaz CV.pdf

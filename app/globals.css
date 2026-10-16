@@ -1,120 +1,239 @@
 @import "tailwindcss";
 
+/* Estética cinematográfica: negro profundo, luz violeta y cian, cristal oscuro. */
+:root {
+  --bg: #050507;
+  --panel: #0b0c10;
+  --ink: #f2f3f5;
+  --muted: #8b909a;
+  --line: rgba(255, 255, 255, 0.08);
+  --violet: #8b7cff;
+  --cyan: #5ee6d6;
+  --nav: 68px;
+
+  --font-display: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  --font-code: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-violet: var(--violet);
+  --color-cyan: var(--cyan);
+  --font-sans: var(--font-display);
+  --font-mono: var(--font-code);
+}
+
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--nav);
+  background: var(--bg);
 }
 
-/* Subtle dot grid on the entire page */
 body {
-  background-image: radial-gradient(circle, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  overflow-x: clip;
 }
 
-/* Selection highlight */
 ::selection {
-  background: rgba(96, 165, 250, 0.2);
-  color: #bfdbfe;
+  background: var(--violet);
+  color: #fff;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-}
-::-webkit-scrollbar-track {
-  background: #020617;
-}
-::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6;
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
 }
 
-/* Entrance animations */
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Titulares grandes y finos, como en las referencias. */
+.display {
+  font-weight: 300;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
 }
 
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.animate-fade-up {
-  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.animate-fade-up-delay-1 {
-  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
-}
-
-.animate-fade-up-delay-2 {
-  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
-}
-
-.animate-fade-up-delay-3 {
-  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
-}
-
-.animate-fade-up-delay-4 {
-  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
-}
-
-.gradient-text-animated {
-  background: linear-gradient(135deg, #60a5fa, #93c5fd, #bfdbfe, #60a5fa);
-  background-size: 300% 300%;
+/* Texto con un brillo suave de arriba abajo (blanco a gris). */
+.text-sheen {
+  background: linear-gradient(180deg, #fff 30%, rgba(255, 255, 255, 0.55));
   -webkit-background-clip: text;
   background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradient-shift 5s ease infinite;
+  color: transparent;
 }
 
-/* Hero project collage drift (each row holds its images twice, so -50% loops seamlessly) */
-@keyframes collage-drift {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+/* Panel de cristal oscuro. */
+.glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-.collage-drift {
-  animation: collage-drift 90s linear infinite;
+/* Brillo que sigue al cursor (coordenadas en --mx / --my). */
+.spotlight {
+  position: relative;
+}
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), rgba(139, 124, 255, 0.1), transparent 60%);
+}
+.spotlight:hover::before {
+  opacity: 1;
 }
 
-.collage-drift-reverse {
-  animation: collage-drift 90s linear infinite reverse;
+/* El planeta: una esfera oscura con el borde iluminado. */
+.planet {
+  border-radius: 9999px;
+  background: radial-gradient(circle at 50% 120%, #0b0c10 55%, #1a1640 72%, transparent 73%);
+  box-shadow:
+    0 -2px 60px 0 rgba(139, 124, 255, 0.55),
+    0 -30px 160px 20px rgba(94, 230, 214, 0.18),
+    inset 0 2px 1px rgba(255, 255, 255, 0.5),
+    inset 0 30px 80px -20px rgba(139, 124, 255, 0.55);
+  animation: breathe 7s ease-in-out infinite;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .collage-drift,
-  .collage-drift-reverse {
-    animation: none;
+@keyframes breathe {
+  50% {
+    box-shadow:
+      0 -2px 80px 4px rgba(139, 124, 255, 0.7),
+      0 -40px 200px 30px rgba(94, 230, 214, 0.24),
+      inset 0 2px 1px rgba(255, 255, 255, 0.6),
+      inset 0 40px 100px -20px rgba(139, 124, 255, 0.65);
   }
 }
 
-/* Blinking terminal cursor */
-@keyframes terminal-blink {
-  0%, 50% { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
+/* Aparición por secciones: desenfoque + subida. Solo se oculta si hay JS. */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(8px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+html.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
 }
 
-.terminal-cursor {
-  animation: terminal-blink 1.1s step-end infinite;
+/* Palabras del titular que entran una a una. */
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(0.4em); filter: blur(10px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.word-in {
+  display: inline-block;
+  animation: word-in 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i) * 90ms + 150ms);
+}
+
+/* La captura nueva entra al cambiar de pestaña. */
+@keyframes shot-in {
+  from { opacity: 0; transform: scale(1.02); }
+  to { opacity: 1; transform: none; }
+}
+.shot-in {
+  animation: shot-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes caret {
+  50% { opacity: 0; }
+}
+.caret {
+  animation: caret 1s step-end infinite;
+}
+
+/* Cinta de tecnologías que avanza sin fin. */
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  animation: marquee 40s linear infinite;
+}
+
+/* Anillo 3D de tarjetas de proyecto en la cabecera. */
+.orbit-stage {
+  --orbit-r: 250px;
+  --card-w: 290px;
+  position: relative;
+  perspective: 1600px;
+}
+.orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  animation: orbit 32s linear infinite;
+}
+.orbit-stage:hover .orbit {
+  animation-play-state: paused;
+}
+/* Las tarjetas de espaldas no se ven (también sus capas internas, que se pintan aparte). */
+.orbit-card,
+.orbit-card * {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.orbit-card {
+  position: absolute;
+  width: var(--card-w);
+  left: calc(var(--card-w) / -2);
+  top: -130px;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+@keyframes orbit {
+  from { transform: rotateX(-10deg) rotateY(0deg); }
+  to { transform: rotateX(-10deg) rotateY(-360deg); }
+}
+.bob {
+  animation: bob 5.5s ease-in-out infinite;
+}
+@keyframes bob {
+  50% { transform: translateY(-14px); }
+}
+@media (max-width: 1279px) {
+  .orbit-stage {
+    --orbit-r: 210px;
+    --card-w: 250px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .terminal-cursor {
+  .orbit,
+  .bob {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  html.js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  .word-in,
+  .shot-in,
+  .caret,
+  .marquee,
+  .planet {
     animation: none;
   }
 }

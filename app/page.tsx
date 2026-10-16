@@ -1,10 +1,10 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/sections/Hero";
-import About from "@/components/sections/About";
 import Projects from "@/components/sections/Projects";
-import Experience from "@/components/sections/Experience";
-import Education from "@/components/sections/Education";
+import About from "@/components/sections/About";
+import Trajectory from "@/components/sections/Trajectory";
 import Contact from "@/components/sections/Contact";
+import Footer from "@/components/sections/Footer";
 
 export default function Home() {
   return (
@@ -12,12 +12,12 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
-        <About />
         <Projects />
-        <Experience />
-        <Education />
+        <About />
+        <Trajectory />
         <Contact />
       </main>
+      <Footer />
     </>
   );
 }
