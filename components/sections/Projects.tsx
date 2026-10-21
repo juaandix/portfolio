@@ -205,15 +205,28 @@ function ProjectCard({ project, index, dimmed }: { project: Project; index: numb
 
               <div className="mt-auto flex flex-wrap items-end justify-between gap-4 pt-8">
                 <p className="max-w-[40ch] font-mono text-[0.75rem] leading-relaxed text-muted">{project.tags.join(" · ")}</p>
-                <a
-                  href={project.repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex h-10 items-center gap-1.5 rounded-full glass px-4 text-[0.875rem] transition-colors hover:bg-white/10"
-                >
-                  Código
-                  <ArrowUpRight size={16} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </a>
+                <div className="flex gap-2">
+                  {project.demo && (
+                    <a
+                      href={project.demo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group inline-flex h-10 items-center gap-1.5 rounded-full glass px-4 text-[0.875rem] transition-colors hover:bg-white/10"
+                    >
+                      Probar
+                      <ArrowUpRight size={16} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                    </a>
+                  )}
+                  <a
+                    href={project.repo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex h-10 items-center gap-1.5 rounded-full glass px-4 text-[0.875rem] transition-colors hover:bg-white/10"
+                  >
+                    Código
+                    <ArrowUpRight size={16} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>

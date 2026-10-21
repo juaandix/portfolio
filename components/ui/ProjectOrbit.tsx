@@ -17,7 +17,7 @@ const PICKS: Record<string, number[][]> = {
   documind: [[0], [3], [5]],
   prodsync: [[1], [6]],
   kickscontrol: [[0], [5], [6]],
-  dietapp: [[0, 2], [3, 4]],
+  dietapp: [[0, 1], [6, 7]],
 };
 
 const FRAMES = PROJECTS.flatMap((p) =>
