@@ -175,6 +175,7 @@ export const PROJECTS: Project[] = [
       { src: "/screenshots/09-budgets.png", alt: "Presupuestos" },
       { src: "/screenshots/10-client-detail.png", alt: "Ficha de cliente" },
       { src: "/screenshots/11-project-detail.png", alt: "Ficha de proyecto" },
+      { src: "/screenshots/12-user-detail.png", alt: "Ficha de usuario" },
     ],
     features: [
       {
