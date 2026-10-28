@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 import { Tilt } from "@/components/ui/Tilt";
 import { PROJECTS, TECH_FILTERS, type Project, type Tint } from "@/lib/projects";
+import { ProjectName } from "@/components/ui/ProjectName";
 
 // Halo de luz de cada proyecto (rgb) y color del texto de acento.
 const GLOW: Record<Tint, { rgb: string; text: string }> = {
@@ -170,7 +171,7 @@ function ProjectCard({ project, index, dimmed }: { project: Project; index: numb
               </div>
 
               <h3 id={`title-${project.id}`} className="display mt-5 text-[clamp(2.25rem,1.5rem+2.4vw,3.5rem)]">
-                {project.name}
+                <ProjectName id={project.id} name={project.name} />
               </h3>
               <p className="mt-4 text-[1rem] text-muted">{project.summary}</p>
 

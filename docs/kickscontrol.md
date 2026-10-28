@@ -7,7 +7,13 @@
 
 ## Descripción
 
-KicksControl es una aplicación web full-stack de venta de calzado deportivo con un backoffice de gestión avanzado. El diferenciador no es el e-commerce en sí, sino el panel de administración diseñado con **lógica de operaciones retail real**: gestión de inventario por variantes complejas y analítica de KPIs de turno directamente derivados de la experiencia trabajando como Shift Leader.
+KicksControl es una aplicación full-stack de una tienda de zapatillas y ropa con tres caras que comparten **un único stock por talla y color**:
+
+1. **Tienda online** (`/`) — catálogo, ficha de producto con el stock de cada talla, cesta, checkout y pedidos.
+2. **Tienda física** (`/tienda`) — portada para los dispositivos de la tienda, catálogo con lo que queda en el almacén, **caja (TPV)** e inventario; caja e inventario piden el acceso del personal.
+3. **Backoffice** (`/backoffice`) — dashboard de KPIs de turno, inventario por variante, reposición, pedidos de ambos canales y usuarios.
+
+El diferenciador no es el e-commerce en sí, sino la **lógica de operaciones retail real** que hay detrás: inventario por variante, trazabilidad de cada ajuste de stock, una caja que vende del mismo almacén que la web sin vender dos veces la última unidad, y KPIs de turno (sell-through, cobertura, merma) que salen de la experiencia como Shift Leader en Foot Locker.
 
 ---
 
@@ -27,8 +33,10 @@ KicksControl es una aplicación web full-stack de venta de calzado deportivo con
 
 ## Funcionalidades
 
-### Tienda (clientes)
+### Tienda online (clientes)
 
+- **Identidad de almacén** — base blanca al estilo Kith / SVD con personalidad propia: etiqueta de caja de zapatos (código de barras, referencia, unidades) en cada producto y una franja de stock en directo sobre la cabecera
+- **Páginas de categoría propias** — Running, Basketball, Lifestyle y Skateboarding tienen cada una su diseño, no una plantilla recoloreada
 - **Catálogo con filtros dinámicos** — marca, categoría, talla, color, género e in-stock almacenados en la URL (bookmarkeable y compartible, con soporte SEO)
 - **Detalle de producto** — selector de talla y color con estado de stock en tiempo real por variante
 - **Carrito persistente en servidor** — sincronizado entre dispositivos y pestañas, sin `localStorage`
@@ -36,16 +44,26 @@ KicksControl es una aplicación web full-stack de venta de calzado deportivo con
 - **Historial de pedidos** con badges de estado y vista de detalle
 - **Pasarela de pago simulada** con animación de tarjeta y descarga de recibo en PDF
 
+### Tienda física (personal y clientes en tienda)
+
+- **Portada de tienda** (`/tienda`) — tres accesos: Catálogo (abierto) y Caja e Inventario (con candado: piden el inicio de sesión del personal y vuelven a la pantalla pedida)
+- **Catálogo de tienda** — buscador, filtro por categoría y la matriz talla × color con las unidades que quedan en el almacén
+- **Caja (TPV)** — escaneo de SKU (un lector de códigos teclea el SKU + Enter) o búsqueda por modelo, ticket con cantidades limitadas al stock, cobro con tarjeta o efectivo con cálculo del cambio, comprobante y resumen de "Hoy en caja"
+- La venta en caja **nace entregada**, queda a nombre del dependiente y aparece en el backoffice con la etiqueta *Tienda*
+
 ### Backoffice (ADMIN / SHIFT_LEADER)
 
-- **Gestión de inventario** — tabla expandible por modelo, modal de ajuste de stock con delta (+/-) y motivo (RECEPCIÓN / AJUSTE / MERMA / DEVOLUCIÓN)
-- **Gestión de pedidos** — transiciones de estado inline
+- **Gestión de inventario** — fila por modelo con miniatura, avisos de tallas agotadas o bajas y una **matriz talla × color** donde cada caja se pulsa para ajustar su stock
+- **Ajuste de stock trazable** — delta (+/−) y motivo (Recepción / Devolución / Recuento / Merma); el servidor valida el signo (una merma no puede sumar) y cada ajuste queda en `stock_movements` con autor y stock resultante, visible como historial de la caja
+- **Lista de reposición** — las variantes con ≤ 5 unidades, de la más vacía a la menos, con acceso directo al ajuste
+- **Gestión de pedidos** — filtros por estado con recuento, paginación, desglose de artículos, canal (online / tienda) y transiciones de estado inline
 - **Dashboard KPI** — rango de fechas configurable + granularidad (día / semana / mes):
   - Ingresos totales, pedidos, ticket medio, unidades vendidas
   - **Sell-Through Rate** — `unidades vendidas × 100 / (vendidas + stock actual)`
   - **Días de Cobertura** — `stock actual / ventas diarias medias`
-  - **Tasa de Merma** — ajustes negativos / total de movimientos
-  - Gráfico de ingresos, top sellers, pedidos por estado
+  - **Tasa de Merma** — unidades dadas de baja por merma / (vendidas + dadas de baja)
+  - Gráfico de ingresos, lo que más sale y pedidos por estado
+  - Cuenta como venta todo pedido confirmado, enviado o entregado, de la web y de la caja
 
 ---
 
@@ -72,6 +90,16 @@ Tres mecanismos independientes previenen la venta de más unidades de las dispon
 
 Los tres mecanismos disparan dentro de un único método `@Transactional` que también limpia el carrito de forma atómica.
 
+### Un único stock para dos canales
+
+Web y caja venden del mismo almacén. El descuento de stock con las tres capas vive en un único método privado (`takeFromShelf`) que usan tanto `checkout()` como `storeSale()`: bloquea cada variante con `SELECT FOR UPDATE`, comprueba las unidades, las descuenta y congela el precio. Si un cliente online y el dependiente intentan llevarse la última unidad a la vez, uno de los dos recibe `InsufficientStockException` y su transacción hace rollback completo.
+
+Cada pedido lleva `channel` (`ONLINE` / `STORE`), `payment_method` y `cash_given`; en una venta de caja `user_id` es el dependiente que la cobró.
+
+### Trazabilidad de stock: `stock_movements`
+
+Cada ajuste manual (recepción, devolución, recuento, merma) se guarda con autor, motivo, delta y stock resultante, en la misma transacción que el cambio de stock y con el mismo bloqueo de fila. Las reglas del motivo (`StockMovementReason`: una recepción suma, una merma resta) se validan en el servidor, no solo en la interfaz. Así la tasa de merma del dashboard es un dato real y cada caja tiene su historial ("−1 · Recuento · Juan García · quedan 0").
+
 ### Filtros dinámicos con JPA Specifications
 
 El endpoint de catálogo soporta hasta 7 filtros combinables. En lugar de los 127 métodos de repositorio que requeriría la aproximación naive, `ProductSpecification` construye dinámicamente los predicados de la query con la Criteria API de JPA. Los filtros por talla y stock usan subqueries `EXISTS` sobre `product_variants` para evitar duplicados en la paginación.
@@ -88,7 +116,7 @@ Las métricas del dashboard no son genéricas — son las que se usan en operaci
 |---|---|---|
 | Sell-Through Rate | `vendidas × 100 / (vendidas + stock)` | Eficiencia de la compra de producto |
 | Días de Cobertura | `stock / ventas diarias medias` | Alerta de reposición de stock |
-| Tasa de Merma | `ajustes negativos / total movimientos` | Pérdida por robo, daño o error |
+| Tasa de Merma | `uds merma × 100 / (uds vendidas + uds merma)` | Qué parte de lo que salió de la estantería fue pérdida (robo, daño, error) y no venta |
 | Ticket Medio | `ingresos / pedidos` | Rentabilidad por transacción |
 
 ### Autenticación JWT stateless
@@ -117,11 +145,13 @@ kickscontrol/
 │
 ├── kickscontrol-frontend/         Next.js 16 App Router
 │   ├── app/
-│   │   ├── (store)/               Catálogo, producto, carrito, pedidos
-│   │   ├── backoffice/            Dashboard, inventario, pedidos (admin)
+│   │   ├── (store)/               Tienda online: catálogo, categorías, producto, checkout, pedidos
+│   │   ├── tienda/                Tienda física: portada, catálogo, caja, inventario
+│   │   ├── backoffice/            Dashboard, inventario, pedidos, usuarios
 │   │   └── login / register/
 │   ├── components/
-│   │   ├── backoffice/            KpiCard, gráficos Recharts, StockAdjustModal
+│   │   ├── tienda/                StoreShell, Till (caja), StoreCatalog, ProductSizes
+│   │   ├── backoffice/            KpiCard, gráficos, StockAdjustModal, LowStockPanel
 │   │   ├── cart/                  CartDrawer
 │   │   └── catalog/               FilterPanel, ProductGrid
 │   ├── context/                   AuthContext (useReducer), CartContext
@@ -137,10 +167,10 @@ kickscontrol/
 
 | Capa | Framework | Qué se cubre |
 |---|---|---|
-| Servicios backend | JUnit 5 + Mockito | Lógica de checkout, carrito, merge de ítems |
+| Servicios backend | JUnit 5 + Mockito | Checkout, venta en caja (efectivo, cambio, líneas repetidas, stock insuficiente), ajuste de stock y su registro, carrito |
 | Controladores backend | @WebMvcTest + MockMvc | Mapeo de rutas, serialización JSON, códigos HTTP |
 | Utilidades JWT | JUnit 5 + ReflectionTestUtils | Generación, validación y expiración de tokens |
-| Componentes frontend | Vitest 4 + React Testing Library | Login, registro, ProductCard, comportamiento UI |
+| Componentes frontend | Vitest 4 + React Testing Library | Login, KpiCard, StockBadge, analytics, detección de SKU escaneado |
 | End-to-end | Playwright | Flujo completo de registro → checkout → pedido |
 
 ---
@@ -164,7 +194,8 @@ Documentación interactiva completa en `/swagger-ui.html`. Endpoints principales
 | Catálogo | `GET /api/products` (7 filtros) · `GET /api/products/{id}` |
 | Carrito | `GET/POST /api/cart` · `PUT/DELETE /api/cart/items/{id}` |
 | Pedidos | `POST /api/orders/checkout` · `GET /api/orders` |
-| Admin — Inventario | `PATCH /api/admin/variants/{id}/stock` · alertas de stock bajo |
+| Tienda física | `POST /api/store/sales` · `GET /api/store/sales/today` · `GET /api/store/variants/{sku}` |
+| Admin — Inventario | `PATCH /api/admin/variants/{id}/stock` · `GET /api/admin/variants/{id}/movements` · alertas de stock bajo |
 | Admin — Pedidos | `GET /api/admin/orders` · `PATCH /api/admin/orders/{id}/status` |
 | Analytics | `GET /api/admin/analytics/summary` · `/revenue-chart` · `/top-sellers` |
 
@@ -182,8 +213,20 @@ make full
 - API: `http://localhost:8080`
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 
-Cuenta de administrador del seed: `admin@kickscontrol.com` / `Admin1234!`
+Cuentas del seed:
+
+| Rol | Email | Contraseña |
+|---|---|---|
+| Admin | `admin@kickscontrol.com` | `Admin1234!` |
+| Shift Leader | `shiftleader@kickscontrol.com` | `Admin1234!` |
+| Cliente | `cliente@kickscontrol.com` | `User1234!` |
 
 ---
 
-*Proyecto desarrollado íntegramente por Juan David Gil. Sprints 1–4 completados: cimientos, catálogo e inventario, carrito y checkout transaccional, KPI dashboard y suite de tests.*
+## Capturas
+
+23 capturas de la tienda online, el backoffice y la tienda física en el repositorio: [`docs/capturas/`](https://github.com/juaandix/kickscontrol/tree/main/docs/capturas). La web del portfolio usa una selección en `public/kickscontrol/`.
+
+---
+
+*Proyecto desarrollado íntegramente por Juan David Gil. Sprints 1–5 completados: cimientos, catálogo e inventario, carrito y checkout transaccional, KPI dashboard, y rediseño con trazabilidad de stock y tienda física.*

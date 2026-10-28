@@ -12,17 +12,9 @@ const GLOW: Record<Tint, string> = {
   emerald: "52,211,153",
 };
 
-// Fotogramas: varias capturas por proyecto (en DietApp, pares de móviles).
-const PICKS: Record<string, number[][]> = {
-  documind: [[0], [3], [5]],
-  prodsync: [[1], [6]],
-  kickscontrol: [[0], [5], [6]],
-  dietapp: [[0, 1], [6, 7]],
-};
-
-const FRAMES = PROJECTS.flatMap((p) =>
-  (PICKS[p.id] ?? [[0]]).map((idx) => ({ project: p, shots: idx.map((i) => p.screenshots[i]) }))
-);
+// La portada de cada proyecto, intercalados (A B C D A B C D): un anillo lleno sin dos seguidas del mismo.
+const ROUNDS = 2;
+const FRAMES = Array.from({ length: ROUNDS }, () => PROJECTS.map((p) => ({ project: p, shots: [p.screenshots[0]] }))).flat();
 const N = FRAMES.length;
 const STEP = 360 / N;
 // Radio para que los fotogramas queden pegados: (ancho + hueco) / (2·tan(π/n)).
@@ -50,7 +42,6 @@ export function ProjectOrbit({ className = "" }: { className?: string }) {
     dragging: false,
     lastX: 0,
     moved: 0,
-    hovered: false,
     reduced: false,
   });
   const [front, setFront] = useState(0);
@@ -76,7 +67,7 @@ export function ProjectOrbit({ className = "" }: { className?: string }) {
           st.angle += st.velocity;
           st.velocity *= 0.92;
           if (Math.abs(st.velocity) <= 0.05) st.target = snap(st.angle);
-        } else if (!st.hovered && !st.reduced) {
+        } else if (!st.reduced) {
           st.angle -= AUTO_SPEED;
         }
       }
@@ -115,17 +106,10 @@ export function ProjectOrbit({ className = "" }: { className?: string }) {
   }, []);
 
   const rotateBy = useCallback((dir: 1 | -1) => {
-    // Salta al primer fotograma del proyecto siguiente (o anterior), girando en ese sentido.
+    // Los proyectos van intercalados: el fotograma de al lado ya es el proyecto siguiente (o anterior).
     const st = s.current;
-    const cur = snap(st.target ?? st.angle);
-    const pi = PROJECTS.findIndex((p) => p.id === FRAMES[frontOf(cur)].project.id);
-    const nextId = PROJECTS[(pi + dir + PROJECTS.length) % PROJECTS.length].id;
-    const j = FRAMES.findIndex((f) => f.project.id === nextId);
-    let delta = (((-j * STEP - cur) % 360) + 540) % 360 - 180;
-    if (dir === 1 && delta >= 0) delta -= 360;
-    if (dir === -1 && delta <= 0) delta += 360;
     st.velocity = 0;
-    st.target = cur + delta;
+    st.target = snap(st.target ?? st.angle) - dir * STEP;
   }, []);
 
   const current = FRAMES[front];
@@ -143,12 +127,6 @@ export function ProjectOrbit({ className = "" }: { className?: string }) {
           st.moved = 0;
           st.velocity = 0;
           st.target = null;
-        }}
-        onPointerEnter={(e) => {
-          if (e.pointerType === "mouse") s.current.hovered = true;
-        }}
-        onPointerLeave={() => {
-          s.current.hovered = false;
         }}
         onKeyDown={(e) => {
           if (e.key === "ArrowLeft") rotateBy(-1);
